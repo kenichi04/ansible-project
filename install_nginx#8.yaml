@@ -1,0 +1,42 @@
+# install Nginx using Ansible
+# Start and Enable Nginx
+# Check the status of Nginx
+# Collect host information
+- name: Setup nginx server on myserver list (host group)
+  hosts:
+    - devservers
+  become: True
+
+  tasks:
+    - name: Install the latest version of nginx
+      command: amazon-linux-extras install nginx1 -y
+
+    - name: Start nginx service
+      service:
+        name: nginx
+        state: started
+
+    - name: Enable nginx service # 自動起動の有効化
+      service:
+        name: nginx
+        enabled: yes
+
+    - name: Get nginx Installed version
+      command: nginx -v
+
+    - name: Get status of nginx service
+      command: systemctl status nginx
+
+    - name: Create directory
+      file:
+        path: /home/ec2-user/registervar
+        state: directory
+      register: create_dir  # register変数
+
+    - name: Create file
+      file:
+        path: /home/ec2-user/registervar/registervar.txt
+        state: touch
+      # taskの実行条件
+      # when: create_dir.changed == true
+      when: create_dir.changed  # コメントアウトと同じ内容
