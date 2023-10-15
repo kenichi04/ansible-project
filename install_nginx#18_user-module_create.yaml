@@ -1,0 +1,41 @@
+# install Nginx using Ansible
+# Start and Enable Nginx
+# Check the status of Nginx
+# Collect host information
+- name: Setup nginx server on myserver list (host group)
+  hosts:
+    - devservers
+  become: True
+
+  tasks:
+    - name: Install the latest version of nginx
+      command: amazon-linux-extras install nginx1 -y
+
+    - name: Start nginx service
+      service:
+        name: nginx
+        state: started
+
+    - name: Enable nginx service # 自動起動の有効化
+      service:
+        name: nginx
+        enabled: yes
+
+    - name: Get nginx Installed version
+      command: nginx -v
+
+    - name: Get status of nginx service
+      command: systemctl status nginx
+
+    - name: Create new user
+      user:
+        name: newuser
+        group: users
+        createhome: yes
+        shell: /bin/bash
+
+    - name: Add authorized key for new user
+      authorized_key:
+        user: newuser
+        # 公開鍵の読み取り（今回はマスターとターゲットの鍵が同じため）
+        key: "{{ lookup('file', '~/.ssh/authorized_keys') }}"
