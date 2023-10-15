@@ -1,0 +1,2 @@
+user tempmoduleuser;
+access_log  /var/log/tempmodule/access.log;

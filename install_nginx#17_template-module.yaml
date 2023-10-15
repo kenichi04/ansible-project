@@ -1,0 +1,36 @@
+# install Nginx using Ansible
+# Start and Enable Nginx
+# Check the status of Nginx
+# Collect host information
+- name: Setup nginx server on myserver list (host group)
+  hosts:
+    - devservers
+  become: True
+
+  tasks:
+    - name: Install the latest version of nginx
+      command: amazon-linux-extras install nginx1 -y
+
+    - name: Generate config file
+      template:
+        src: 'tempmodule.conf.j2' # Jinja2テンプレートファイル
+        dest: '/home/ec2-user/tempmodule.conf'
+      # 変数定義
+      vars:
+        access_log_path: /var/log/tempmodule/access.log
+
+    - name: Start nginx service
+      service:
+        name: nginx
+        state: started
+
+    - name: Enable nginx service # 自動起動の有効化
+      service:
+        name: nginx
+        enabled: yes
+
+    - name: Get nginx Installed version
+      command: nginx -v
+
+    - name: Get status of nginx service
+      command: systemctl status nginx
